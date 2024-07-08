@@ -1,22 +1,7 @@
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-
 dotenv.config({ path: './config.env' });
+const connectDb = require('./scripts/connectDb');
 const app = require('./app');
-
-const db = process.env.DATABASE_URL.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD,
-);
-mongoose
-  .connect(db, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('Database connection successful.'))
-  .catch((err) => console.log(err));
 
 /*
 const tourSchema = new mongoose.Schema({
@@ -51,5 +36,7 @@ testTour
   });
 */
 app.listen(process.env.PORT, process.env.HOST, () => {
-  console.log('Server is running at port 8000 on localhost');
+  console.log(
+    `Server is running at port ${process.env.PORT} on ${process.env.HOST}`,
+  );
 });
