@@ -121,8 +121,9 @@ exports.deleteTour = (req, res) => {
 // Handlers by using Hosted Mongo DB.
 
 exports.getAllTours = async (req, res) => {
+  console.log(req.query);
   try {
-    const allTours = await Tour.find();
+    const allTours = await Tour.find(req.query);
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestedTime,

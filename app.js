@@ -57,7 +57,6 @@ app
     .delete(deleteUser);
   */
 // 6 Mounting routers as a middle ware
-
 // const tourRouter = express.Router();
 // const userRouter = express.Router();
 
