@@ -1,7 +1,9 @@
 const dotenv = require('dotenv');
+
 dotenv.config({ path: './config.env' });
-const connectDb = require('./scripts/connectDb');
 const app = require('./app');
+
+require('./scripts/connectDb');
 
 /*
 const tourSchema = new mongoose.Schema({
@@ -35,8 +37,6 @@ testTour
     console.log('ERROR 😒:', err);
   });
 */
-app.listen(process.env.PORT, process.env.HOST, () => {
-  console.log(
-    `Server is running at port ${process.env.PORT} on ${process.env.HOST}`,
-  );
+app.listen(8000, 'localhost', () => {
+  console.log(`Server is running at port 8000 on localhost `);
 });

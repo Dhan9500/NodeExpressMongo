@@ -1,6 +1,8 @@
 const fs = require('fs');
 const Tour = require('../models/tourModel');
-const connectDb=require('./connectDb');
+// eslint-disable-next-line no-unused-vars
+const connectDb = require('./connectDb');
+
 // Reading the json file
 const tours = JSON.parse(
   fs.readFileSync('../dev-data/data/tours-simple.json', 'utf-8'),
