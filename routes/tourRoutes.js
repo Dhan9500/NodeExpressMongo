@@ -5,13 +5,10 @@ const router = express.Router();
 // router.param('id', tourControllers.checkId);
 // Aliasing
 
-router
-  .route('/top-5-cheap')
-  .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
-router
-  .route('/')
-  .get(tourControllers.getAllTours)
-  .post(tourControllers.createNewTour);
+router.route('/top-5-cheap').get(tourControllers.aliasTopTours, tourControllers.getAllTours);
+router.route('/tour-stats').get(tourControllers.getTourStats);
+router.route('/').get(tourControllers.getAllTours).post(tourControllers.createNewTour);
+router.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan);
 router
   .route('/:id')
   .get(tourControllers.getTour)
