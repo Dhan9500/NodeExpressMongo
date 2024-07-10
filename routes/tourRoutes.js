@@ -3,6 +3,11 @@ const tourControllers = require('../controllers/tourControllers');
 
 const router = express.Router();
 // router.param('id', tourControllers.checkId);
+// Aliasing
+
+router
+  .route('/top-5-cheap')
+  .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
 router
   .route('/')
   .get(tourControllers.getAllTours)
