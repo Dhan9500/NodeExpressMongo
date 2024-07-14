@@ -13,9 +13,15 @@
 					"name": "Get All Tours",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OTM4N2JmYWE4ZjY3NDZhMGNlYmRjMyIsImlhdCI6MTcyMDk0NTEyOCwiZXhwIjoxNzIxMDMxNTI4fQ.TzONioYiPCIlL8rYIwZZGl_btkokbINyqCxDSxLrBbs",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/tours?page=3&limit=2&sort=-ratingsAverage,price",
+							"raw": "http://localhost:8000/api/v1/tours",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -25,20 +31,6 @@
 								"api",
 								"v1",
 								"tours"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "3"
-								},
-								{
-									"key": "limit",
-									"value": "2"
-								},
-								{
-									"key": "sort",
-									"value": "-ratingsAverage,price"
-								}
 							]
 						}
 					},
@@ -95,7 +87,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"Test tour1\",\r\n    \"duration\":10,\r\n    \"difficulty\":\"easy\",\r\n    \"price\":200,\r\n    \"rating\":4.2\r\n}",
+							"raw": "{\r\n                \"ratingsAverage\": 4.9,\r\n                \"ratingsQuantity\": 37,\r\n                \"images\": [\r\n                    \"tour-1-1.jpg\",\r\n                    \"tour-1-2.jpg\",\r\n                    \"tour-1-3.jpg\"\r\n                ],\r\n                \"startDates\": [\r\n                    \"2021-04-25T10:00:00.000Z\",\r\n                    \"2021-07-20T10:00:00.000Z\",\r\n                    \"2021-10-05T10:00:00.000Z\"\r\n                ],\r\n                \"name\": \"The Forest Hiker\",\r\n                \"duration\": 5,\r\n                \"maxGroupSize\": 25,\r\n                \"difficulty\": \"easy\",\r\n                \"price\": 397,\r\n                \"summary\": \"Breathtaking hike through the Canadian Banff National Park\",\r\n                \"description\": \"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\r\n                \"imageCover\": \"tour-1-cover.jpg\"\r\n            }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -125,7 +117,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"duration\":40\r\n}",
+							"raw": "{\r\n    \"name\":\"short\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -133,7 +125,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/tours/9",
+							"raw": "http://localhost:8000/api/v1/tours/668bc884a13a6017457e0c16",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -143,7 +135,7 @@
 								"api",
 								"v1",
 								"tours",
-								"9"
+								"668bc884a13a6017457e0c16"
 							]
 						}
 					},
@@ -166,6 +158,51 @@
 								"v1",
 								"tours",
 								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tour Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/tours/tour-stats",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								"tour-stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Plan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/tours/monthly-plan/2021",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								"monthly-plan",
+								"2021"
 							]
 						}
 					},
@@ -280,6 +317,68 @@
 								"v1",
 								"users",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Test6\",\r\n    \"email\":\"test@6.com\",\r\n    \"password\":\"pass12345\",\r\n    \"passwordConfirm\":\"pass12345\",\r\n    \"changedPasswordAt\":\"2024-06-13\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"test@6.com\",\r\n    \"password\":\"pass12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
 							]
 						}
 					},
