@@ -1,5 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorHandler');
+
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -17,19 +20,19 @@ app.post('/', (req, res) => {
 // 1) MIDDLEWARES
 console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+    app.use(morgan('dev'));
 }
 app.use(express.json());
 // app.use(express.static('./public'));
 // Creating our own middle-ware: Note: Middle-ware order really matters.....
 app.use((req, res, next) => {
-  console.log('Hello from the middle-ware.....');
-  next();
+    console.log('Hello from the middle-ware.....');
+    next();
 });
 
 app.use((req, res, next) => {
-  req.requestedTime = new Date().toISOString();
-  next();
+    req.requestedTime = new Date().toISOString();
+    next();
 });
 
 /*
@@ -62,6 +65,30 @@ app
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+// Route handler if not match any of the router.....
+app.all('*', (req, res, next) => {
+    /*  res.status(404).json({
+        status: 'failed',
+        message: `Can't find ${req.originalUrl} on this server!`,
+    });
+    next();
+    */
+    // OR;
+    /*const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+    err.statusCode = 404;
+    err.status = 'failed';
+    next(err);*/
+    //OR
+
+    const err = new AppError(`Can't find ${req.originalUrl} on this server!`, 404);
+    next(err);
+});
+
+// Error Middleware
+
+app.use(globalErrorHandler);
+
 //Tours
 /*
 tourRouter.route('/').get(getAllTours).post(createNewTour);

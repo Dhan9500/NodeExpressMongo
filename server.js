@@ -1,6 +1,11 @@
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
+process.on('uncaughtException', (err) => {
+    console.log('UNCAUGHT EXCEPTION..! 💥 Shutting down.....');
+    console.log(err.name, err.message);
+    process.exit(1);
+});
 const app = require('./app');
 
 require('./scripts/connectDb');
@@ -37,6 +42,14 @@ testTour
     console.log('ERROR 😒:', err);
   });
 */
-app.listen(8000, 'localhost', () => {
-  console.log(`Server is running at port 8000 on localhost `);
+const server = app.listen(8000, 'localhost', () => {
+    console.log(`Server is running at port 8000 on localhost `);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION..! 💥 Shutting down.....');
+    console.log(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
+    });
 });
