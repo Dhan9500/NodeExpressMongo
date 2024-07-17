@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const sendMail = require('../utils/email');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) =>
     jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -12,6 +15,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
+        role: req.body.role,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
         changedPasswordAt: req.body.changedPasswordAt,
@@ -52,13 +56,79 @@ exports.protect = catchAsync(async (req, res, next) => {
     // 2. Verification of token
     const decoded = await jwt.verify(token, process.env.JWT_SECRET);
     // 3. Check if user still exist
-    const freshUser = await User.findById(decoded.id);
-    if (!freshUser) {
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
         return next(new AppError('The user belonging to this token does no longer exist.', 401));
     }
     // 4. Check If User Changed Password after issued token.
-    if (freshUser.checkChangedPasswordAt(decoded.iat)) {
+    if (currentUser.changedPasswordAt && currentUser.checkChangedPasswordAt(decoded.iat)) {
         return next(new AppError('User recently changed password! Please login again', 401));
     }
+    // Grant access to current user
+    req.user = currentUser;
+    next();
+});
+
+exports.restrictTo =
+    (...roles) =>
+    (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new AppError('You do not have permission to perform this action', 403));
+        }
+        next();
+    };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    // 1) Get user based on posted email
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return next(new AppError('There is no user with email address.', 401));
+    }
+    // 2) Generate the random reste token
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+    // 3) Send it to user's email
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetpassword/${resetToken}`;
+    const message = `Forgot your password? Submit a PATCH request with your new password and password confirmation to: ${resetUrl}\nIf you didn't forget your password, please ignore this email!`;
+    try {
+        await sendEmail({
+            email: req.body.email,
+            subject: 'Your password reset token (Valid for 10 min)',
+            message,
+        });
+        res.status(200).json({
+            status: 'success',
+            message: 'Token Sent On Mail',
+        });
+    } catch (err) {
+        console.log(err);
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new AppError('Something went wrong! Please try again later', 500));
+    }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    console.log(hashedToken);
+    const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+        return next(new AppError('Token is invalid or has expired! Please try again.', 400));
+    }
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    user.changedPasswordAt = Date.now();
+    await user.save();
+    const token = signToken(user._id);
+    res.status(200).json({
+        status: 'login success',
+        token,
+    });
     next();
 });
