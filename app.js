@@ -1,5 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const express = require('express');
+const helmet = require('helmet');
 const morgan = require('morgan');
+const sanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const rateLimit = require('express-rate-limit');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorHandler');
 
@@ -19,12 +25,37 @@ app.post('/', (req, res) => {
 // Strating the actual one from here..............
 // 1) MIDDLEWARES
 console.log(process.env.NODE_ENV);
+
+// Global Middlewares
+// Setting security headers using helmet
+app.use(helmet());
+//Logging into dev environment
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
-app.use(express.json());
+// Set Limit request from same IP middleware
+const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, Pleasse try again in an hour',
+});
+app.use('/api', limiter);
+// Body parser reading data from body into req.body
+app.use(express.json({ limit: '10kb' }));
+// Data sanitization against NoSQL query injection
+app.use(sanitize());
+// Data sanitization against XSS
+app.use(xss());
+// Preventing parameter population using hpp middleware
+app.use(
+    hpp({
+        whitelist: ['duration'],
+    }),
+);
 // app.use(express.static('./public'));
 // Creating our own middle-ware: Note: Middle-ware order really matters.....
+
+// Test Middleware
 app.use((req, res, next) => {
     console.log('Hello from the middle-ware.....');
     next();
