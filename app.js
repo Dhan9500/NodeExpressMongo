@@ -11,6 +11,7 @@ const globalErrorHandler = require('./controllers/errorHandler');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 /* Demo
@@ -46,7 +47,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(sanitize());
 // Data sanitization against XSS
 app.use(xss());
-// Preventing parameter population using hpp middleware
+// Preventing parameter pollution using hpp middleware
 app.use(
     hpp({
         whitelist: ['duration'],
@@ -96,6 +97,7 @@ app
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // Route handler if not match any of the router.....
 app.all('*', (req, res, next) => {
